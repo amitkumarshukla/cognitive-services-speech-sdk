@@ -7,7 +7,7 @@
 # Check out https://aka.ms/csspeech for documentation.
 #
 
-SPEECHSDK_ROOT:=/change/to/point/to/extracted/SpeechSDK
+SPEECHSDK_ROOT:=/mnt/e/Carbon2/forkSpeechSDK/download/linux/
 
 CHECK_FOR_SPEECHSDK := $(shell test -f $(SPEECHSDK_ROOT)/lib/x64/libMicrosoft.CognitiveServices.Speech.core.so && echo Success)
 ifneq ("$(CHECK_FOR_SPEECHSDK)","Success")
