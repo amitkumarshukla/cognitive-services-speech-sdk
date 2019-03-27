@@ -16,7 +16,11 @@ public class BinaryAudioStreamReader extends PullAudioInputStreamCallback {
     @Override
     public int read(byte[] dataBuffer) {
         try {
-            return insputStream.read(dataBuffer, 0, dataBuffer.length);
+            int retVal = insputStream.read(dataBuffer, 0, dataBuffer.length);
+			if(retVal == -1) {
+				return 0;
+			}
+			return retVal;
         } catch (IOException e) {
             e.printStackTrace();
         }
