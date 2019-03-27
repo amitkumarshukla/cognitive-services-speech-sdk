@@ -5,8 +5,6 @@ using namespace std;
 using namespace Microsoft::CognitiveServices::Speech;
 using namespace Microsoft::CognitiveServices::Speech::Audio;
 
-std::shared_ptr<SpeechRecognizer> recognizer;
-std::shared_ptr<PullAudioInputStream> pullAudio;
 
 void* OpenCompressedFile(const std::string& compressedFileName)
 {
@@ -40,33 +38,35 @@ int ReadCompressedBinaryData(void *_stream, uint8_t *_ptr, uint32_t _buf_size)
 void recognizeSpeech(const std::string& subscriptionKey, const std::string& wavFileName) {
     // Creates an instance of a speech config with specified subscription key and service region.
     // Replace with your own subscription key and service region (e.g., "westus").
-    auto config = SpeechConfig::FromSubscription(subscriptionKey, "westus");
+    std::shared_ptr<SpeechRecognizer> recognizer;
+    std::shared_ptr<PullAudioInputStream> pullAudio;
 
-    
-    //if (wavFileName.find(".mp3") == (wavFileName.size() - 4))
-    //{
-    //    pullAudio = AudioInputStream::CreatePullStream(
-    //        AudioStreamFormat::GetCompressedFormat(AudioStreamContainerFormat::MP3),
-    //        OpenCompressedFile(wavFileName),
-    //        ReadCompressedBinaryData,
-    //        closeStream
-    //    );
-    //    recognizer = SpeechRecognizer::FromConfig(config, AudioConfig::FromStreamInput(m_pullAudioStream));
-    //}
-    //else if (wavFileName.find(".opus") == (wavFileName.size() - 5))
-    //{
-    //    pullAudio = AudioInputStream::CreatePullStream(
-    //        AudioStreamFormat::GetCompressedFormat(AudioStreamContainerFormat::OGG_OPUS),
-    //        OpenCompressedFile(wavFileName),
-    //        ReadCompressedBinaryData,
-    //        closeStream
-    //    );
-    //    recognizer = SpeechRecognizer::FromConfig(config, AudioConfig::FromStreamInput(m_pullAudioStream));
-    //}
-    //else
-    //{
-    recognizer = SpeechRecognizer::FromConfig(config, AudioConfig::FromWavFileInput(wavFileName));
-    //}
+    auto config = SpeechConfig::FromSubscription(subscriptionKey, "westus");
+   
+    if (wavFileName.find(".mp3") == (wavFileName.size() - 4))
+    {
+        pullAudio = AudioInputStream::CreatePullStream(
+            AudioStreamFormat::GetCompressedFormat(AudioStreamContainerFormat::MP3),
+            OpenCompressedFile(wavFileName),
+            ReadCompressedBinaryData,
+            closeStream
+        );
+        recognizer = SpeechRecognizer::FromConfig(config, AudioConfig::FromStreamInput(pullAudio));
+    }
+    else if (wavFileName.find(".opus") == (wavFileName.size() - 5))
+    {
+        pullAudio = AudioInputStream::CreatePullStream(
+            AudioStreamFormat::GetCompressedFormat(AudioStreamContainerFormat::OGG_OPUS),
+            OpenCompressedFile(wavFileName),
+            ReadCompressedBinaryData,
+            closeStream
+        );
+        recognizer = SpeechRecognizer::FromConfig(config, AudioConfig::FromStreamInput(pullAudio));
+    }
+    else
+    {
+        recognizer = SpeechRecognizer::FromConfig(config, AudioConfig::FromWavFileInput(wavFileName));
+    }
 
     auto result = recognizer->RecognizeOnceAsync().get();
 
@@ -87,6 +87,8 @@ void recognizeSpeech(const std::string& subscriptionKey, const std::string& wavF
             cout << "CANCELED: Did you update the subscription info?" << std::endl;
         }
     }
+
+    //recognizer->
 }
 
 int main(int argc, char **argv) {
