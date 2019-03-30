@@ -72,15 +72,25 @@ public class MainActivity extends AppCompatActivity {
         TextView txt = (TextView) this.findViewById(R.id.hello); // 'hello' is the ID of your text view
 
         try {
-            String path = Environment.getExternalStorageDirectory() + "/input/whatstheweatherlike.opus";
+            AudioConfig audConfig = null;
+            String path = Environment.getExternalStorageDirectory() + "/input/batman.opus";
+            PullAudioInputStream pullAudio;
 
-            PullAudioInputStream pullAudio = AudioInputStream.createPullStream(new BinaryAudioStreamReader(path),
-                    AudioStreamFormat.getCompressedFormat(AudioStreamContainerFormat.OGG_OPUS));
-
-            AudioConfig audConfig = AudioConfig.fromStreamInput(pullAudio);
+            if(path.contains(".wav"))
+            {
+                audConfig = AudioConfig.fromWavFileInput(path);
+            }else if(path.contains(".opus")) {
+                pullAudio = AudioInputStream.createPullStream(new BinaryAudioStreamReader(path),
+                        AudioStreamFormat.getCompressedFormat(AudioStreamContainerFormat.OGG_OPUS));
+                audConfig = AudioConfig.fromStreamInput(pullAudio);
+            }
+            else
+            {
+                audConfig = null;
+            }
 
             SpeechConfig config = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
-            config.setSpeechRecognitionLanguage("zh-CN");
+            //config.setSpeechRecognitionLanguage("zh-CN");
 
             SpeechRecognizer reco = new SpeechRecognizer(config, audConfig);
 
